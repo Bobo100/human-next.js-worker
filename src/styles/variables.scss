@@ -1,0 +1,50 @@
+@import "./breakpoints.module.scss";
+
+@mixin rwd-custom(
+  $width: $width-lg,
+  $height: -1,
+  $use-width: true,
+  $use-height: false,
+  $use-min-width: false,
+  $use-min-height: false
+) {
+  @if $use-width and $use-height {
+    @if $use-min-width and $use-min-height {
+      @media (min-width: $width) and (min-height: $height) {
+        @content;
+      }
+    } @else if $use-min-width and not $use-min-height {
+      @media (min-width: $width) and (max-height: $height) {
+        @content;
+      }
+    } @else if not $use-min-width and $use-min-height {
+      @media (max-width: $width) and (min-height: $height) {
+        @content;
+      }
+    } @else {
+      @media (max-width: $width) and (max-height: $height) {
+        @content;
+      }
+    }
+  } @else if $use-width and not $use-height {
+    @if $use-min-width {
+      @media (min-width: $width) {
+        @content;
+      }
+    } @else {
+      @media (max-width: $width) {
+        @content;
+      }
+    }
+  } @else if not $use-width and $use-height {
+    @if $use-min-height {
+      @media (min-height: $height) {
+        @content;
+      }
+    } @else {
+      @media (max-height: $height) {
+        @content;
+      }
+    }
+  }
+}

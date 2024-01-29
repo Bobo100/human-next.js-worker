@@ -1,0 +1,44 @@
+.progressBarContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding: 13%;
+}
+
+.hide {
+  opacity: 0;
+  transition: opacity 800ms step-end;
+}
+
+.progressBarBackground {
+  position: relative;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 6px;
+  background-color: #15171f;
+  border-radius: 6px;
+}
+
+.progressBar {
+  width: 0;
+  height: 100%;
+  border-radius: 6px;
+  background-color: #46e4fa;
+  transition: width 500ms ease-out;
+}
+
+.progressNumber {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translate3d(-50%, 0, 0);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 15px;
+  color: #15171f;
+}

@@ -1,0 +1,12 @@
+@import "./variables.module.scss";
+
+* {
+    box-sizing: border-box;
+}
+
+a {
+    display: inline-block;
+    text-decoration: none;
+    padding: 10px;
+    transition: all 0.2s ease-in-out;
+}

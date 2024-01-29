@@ -1,0 +1,14 @@
+$width-sm: 640px;
+$width-md: 768px;
+$width-lg: 1024px;
+$width-xl: 1280px;
+$width-2xl: 1536px;
+$result-dt-download-share-breakpoint: 1180px;
+
+:export {
+  width-sm: $width-sm;
+  width-md: $width-md;
+  width-lg: $width-lg;
+  width-xl: $width-xl;
+  width-2xl: $width-2xl;
+}
