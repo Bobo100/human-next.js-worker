@@ -45,7 +45,6 @@ class useDetectFaceWorker {
         this.modelsLoaded = true;
       }
     } else {
-      console.log(workers.human);
       if (!workers.human) {
         workers.human = new Worker(
           new URL("./worker/human-worker.js", import.meta.url),
