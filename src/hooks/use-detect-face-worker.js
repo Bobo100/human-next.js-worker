@@ -71,7 +71,6 @@ class useDetectFaceWorker {
     if (!browserUtils.isOffscreenCanvasSupported()) {
       let result = {};
       result = await this.human?.detect(imageData, humanConfig);
-      this.human.tf.dispose();
       return { result: result[type], type: type };
     } else {
       const id = counter.human++;
