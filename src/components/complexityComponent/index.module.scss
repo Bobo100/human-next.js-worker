@@ -1,0 +1,200 @@
+@import "@/styles/variables.scss";
+
+.container {
+  flex: 1 1 0;
+  width: 100%;
+  border: 1px dashed #cacce0;
+  border-radius: 20px;
+  margin: 30px 0 0;
+  padding: 15px;
+  overflow: hidden auto;
+
+  @include rwd-custom($width-sm) {
+    border: none;
+    border-radius: 0;
+    margin: 19px 0 0;
+    padding: 0;
+  }
+}
+
+.selection {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+
+  @include rwd-custom($width-sm) {
+    margin: 0 0 81px;
+  }
+}
+
+.outerWrapper {
+  position: relative;
+  width: 12.5%;
+  border: 5px solid transparent;
+
+  @include rwd-custom($width-lg) {
+    width: 20%;
+  }
+
+  @include rwd-custom($width-sm) {
+    width: 33.3%;
+  }
+
+  @include rwd-custom(450px) {
+    width: 50%;
+  }
+}
+
+.innerWrapper {
+  padding-top: 100%;
+}
+
+%flex-item {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.upload {
+  @extend %flex-item;
+
+  background-color: #f2f2f2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+
+  @include rwd-custom($width-sm) {
+    background-color: transparent;
+    border: 1px dashed #15171f;
+  }
+}
+
+.disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.uploadIcon {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+  object-position: center;
+}
+
+.uploadText {
+  margin: 10px 0 0;
+  font-size: 14px;
+  font-weight: 500;
+
+  @include rwd-custom($width-sm) {
+    display: none;
+  }
+}
+
+.imageWrapper {
+  @extend %flex-item;
+
+  border: 1px solid #cacce0;
+}
+
+.errorWrapper {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: auto;
+  overflow: hidden;
+  background-color: rgb(21 23 31 / 70%);
+  border-radius: 0 0 6px 6px;
+  padding: 7px 5px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  text-align: left;
+}
+
+.errorIcon {
+  position: absolute;
+  top: 3px;
+  left: 4px;
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  object-position: center;
+}
+
+.blur {
+  filter: blur(3px);
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transition: all 500ms ease;
+}
+
+.imageMask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgb(255 255 255 / 80%);
+}
+
+.imageLoading {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, #eaeaea 8%, #d7d7d7 28%, #eaeaea 40%);
+  animation: 1s shimmer linear infinite;
+  background-size: 1000px 200px;
+}
+
+.close {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  background-color: #fff;
+  border-radius: 100%;
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  object-position: center;
+  cursor: pointer;
+}
+
+.checking {
+  display: none;
+}
+
+.checked {
+  display: block;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -500px 0;
+  }
+
+  100% {
+    background-position: 500px 0;
+  }
+}
+
+.selection {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+
+  @include rwd-custom($width-sm) {
+    margin: 0 0 81px;
+  }
+}

@@ -36,6 +36,7 @@ class useDetectFaceWorker {
   }
 
   async importHuman() {
+    console.log("importHuman");
     if (!browserUtils.isOffscreenCanvasSupported()) {
       if (!this.human) {
         const Human = await import("@vladmandic/human");
@@ -44,6 +45,7 @@ class useDetectFaceWorker {
         this.modelsLoaded = true;
       }
     } else {
+      console.log(workers.human);
       if (!workers.human) {
         workers.human = new Worker(
           new URL("./worker/human-worker.js", import.meta.url),
@@ -53,10 +55,9 @@ class useDetectFaceWorker {
           resolvers.human[msg.data.id](msg.data);
           delete resolvers.human[msg.data.id];
         };
-        this.warmup();
-
-        this.modelsLoaded = true;
+        // this.warmup();
       }
+      this.modelsLoaded = true;
     }
   }
 
@@ -71,7 +72,6 @@ class useDetectFaceWorker {
     if (!browserUtils.isOffscreenCanvasSupported()) {
       let result = {};
       result = await this.human?.detect(imageData, humanConfig);
-      console.log(result.performance);
       this.human.tf.dispose();
       return { result: result[type], type: type };
     } else {
@@ -92,8 +92,7 @@ class useDetectFaceWorker {
   }
 }
 
-// const detector = new useDetectFaceWorker();
-
 export default useDetectFaceWorker;
 
+// const detector = new useDetectFaceWorker();
 // export default detector;

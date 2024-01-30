@@ -4,6 +4,14 @@
     margin: 0 auto;
 }
 
+.container_dark {
+    background-color: $background-color-dark;
+}
+
+.container_light {
+    background-color: $background-color;
+}
+
 /* styles/ProgressBar.css */
 .progress_bar {
     height: 4px;
