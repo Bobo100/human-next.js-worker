@@ -95,6 +95,7 @@ export default function HomeComponent() {
       canvas.height = height;
       ctx.drawImage(image, 0, 0, width, height);
       const data = ctx.getImageData(0, 0, width, height);
+      console.log("detectFace");
       const resultFromWorker = await detector.detectFace("face", data);
       const results = await detectFaceUtils.detectFace(resultFromWorker, {
         width,

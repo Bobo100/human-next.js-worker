@@ -54,7 +54,6 @@ class useDetectFaceWorker {
           resolvers.human[msg.data.id](msg.data);
           delete resolvers.human[msg.data.id];
         };
-        // this.warmup();
       }
       this.modelsLoaded = true;
     }
@@ -67,7 +66,7 @@ class useDetectFaceWorker {
   }
 
   async detectFace(type, imageData) {
-    await this.importHuman();
+    if (!this.modelsLoaded) await this.importHuman();
     if (!browserUtils.isOffscreenCanvasSupported()) {
       let result = {};
       result = await this.human?.detect(imageData, humanConfig);

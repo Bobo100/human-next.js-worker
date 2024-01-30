@@ -9,7 +9,6 @@ onmessage = async (msg) => {
     if (!human) {
       human = new Human.default(msg.data.config);
       await human.load();
-      await human.warmup();
     }
     const image = new ImageData(
       new Uint8ClampedArray(msg.data.image),
@@ -17,7 +16,9 @@ onmessage = async (msg) => {
       msg.data.height
     );
     let result = {};
+    console.log("run detect", msg.data.id);
     result = await human.detect(image, msg.data.config);
+    console.log("detect done", msg.data.id);
     const filterResult = result[msg.data.type].map((item) => {
       return {
         mesh: item.mesh,
