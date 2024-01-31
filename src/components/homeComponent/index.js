@@ -18,6 +18,7 @@ export default function HomeComponent() {
   const [fileQueue, setFileQueue] = useState([]);
   const [removedQueue, setRemovedQueue] = useState([]);
   const [modelsLoaded, setModelsLoaded] = useState(false);
+  const [runDownscale, setRunDownscale] = useState(false);
 
   useEffect(() => {
     async function loadDetector() {
@@ -84,12 +85,17 @@ export default function HomeComponent() {
         results: {},
       };
 
-      const [blob] = await imageUtils.downscaleForAvatar(
-        files[idx],
-        4096,
-        4096
-      );
-      const image = await imageUtils.newImage(blob);
+      // 不做downscale
+      let newBlob = files[idx];
+      if (runDownscale) {
+        const [blob] = await imageUtils.downscaleForAvatar(
+          files[idx],
+          4096,
+          4096
+        );
+        newBlob = blob;
+      }
+      let image = await imageUtils.newImage(blob);
       const { width, height } = image;
       canvas.width = width;
       canvas.height = height;
@@ -146,6 +152,20 @@ export default function HomeComponent() {
       <div>
         <div>This is a simple demo of face detection</div>
         <div>Only input images and process using Human Package</div>
+        <div className={styles.checkboxWrapper}>
+          <label
+            className={styles.checkboxLabel}
+            onClick={() => setRunDownscale(!runDownscale)}
+          >
+            run Downscale or not
+          </label>
+          <input
+            type="checkbox"
+            className={styles.checkbox}
+            checked={runDownscale}
+            onChange={() => setRunDownscale(!runDownscale)}
+          />
+        </div>
         <input
           type="file"
           multiple={true}

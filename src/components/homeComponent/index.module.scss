@@ -1,5 +1,25 @@
 @import "@/styles/variables.scss";
 
+.checkboxWrapper {
+  display: flex;
+  align-items: center;
+  margin: 0 0 20px;
+
+  @include rwd-custom($width-sm) {
+    margin: 0 0 10px;
+  }
+}
+.checkboxLabel {
+  margin: 0 20px 0 0;
+  cursor: pointer;
+}
+
+.checkbox {
+  width: 20px;
+  height: 20px;
+  border: 1px solid #cacce0;
+}
+
 .container {
   flex: 1 1 0;
   width: 100%;

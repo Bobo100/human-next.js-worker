@@ -1,24 +1,24 @@
-import _last from 'lodash/last';
-import _padStart from 'lodash/padStart';
-import _get from 'lodash/get';
-import _split from 'lodash/split';
-import _slice from 'lodash/slice';
-import UTIF from 'utif';
-import fileSignatures from './fileSignatures';
+import _last from "lodash/last";
+import _padStart from "lodash/padStart";
+import _get from "lodash/get";
+import _split from "lodash/split";
+import _slice from "lodash/slice";
+import UTIF from "utif";
+import fileSignatures from "./fileSignatures";
 
-const validExtensions = ['.jpg', '.jpeg', '.png', '.tiff', '.tif', '.gif'];
-const validMIMETypes = ['image/jpeg', 'image/png', 'image/tiff', 'image/gif'];
+const validExtensions = [".jpg", ".jpeg", ".png", ".tiff", ".tif", ".gif"];
+const validMIMETypes = ["image/jpeg", "image/png", "image/tiff", "image/gif"];
 const mimeToExtensions = {
-  'image/jpeg': '.jpg',
-  'image/png': '.png',
-  'image/tiff': '.tiff',
-  'image/gif': '.gif',
+  "image/jpeg": ".jpg",
+  "image/png": ".png",
+  "image/tiff": ".tiff",
+  "image/gif": ".gif",
 };
 
 const utils = {
   getFileExtension: (blob) => {
     const { name } = blob;
-    return _last(_slice(_split(name, '.'), 1)) || '';
+    return _last(_slice(_split(name, "."), 1)) || "";
   },
   blob2ArrayBuffer: (blob) => {
     return new Promise((resolve, _) => {
@@ -56,11 +56,11 @@ const utils = {
   },
   getTiffImageData: async (blob) =>
     utils.blob2ArrayBuffer(blob).then(utils.tiffArrayBufferToImageData),
-  imageDataToBlob: (imageData, type = 'image/jpeg') => {
-    const canvas = document.createElement('canvas');
+  imageDataToBlob: (imageData, type = "image/jpeg") => {
+    const canvas = document.createElement("canvas");
     canvas.width = imageData.width;
     canvas.height = imageData.height;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     ctx.putImageData(imageData, 0, 0);
     const dataURL = canvas.toDataURL(type);
     return utils.base64ToBlob(dataURL);
@@ -71,8 +71,8 @@ const utils = {
     }
 
     const sliceSize = 512;
-    let b64Data = base64.replace(/^[^,]+,/, '');
-    b64Data = b64Data.replace(/\s/g, '');
+    let b64Data = base64.replace(/^[^,]+,/, "");
+    b64Data = b64Data.replace(/\s/g, "");
     let byteCharacters = window.atob(b64Data);
     let byteArrays = [];
 
@@ -91,9 +91,9 @@ const utils = {
     const type = base64.match(/image\/[^;]+/);
     return new Blob(byteArrays, { type: type });
   },
-  getGIFFirstFrameBlob: async (blob, type = 'image/jpeg') => {
+  getGIFFirstFrameBlob: async (blob, type = "image/jpeg") => {
     const img = await utils.newImage(blob);
-    const canvas = document.createElement('canvas');
+    const canvas = document.createElement("canvas");
     let width = img.width;
     let height = img.height;
     if (width > 4096 || height > 4096) {
@@ -103,20 +103,20 @@ const utils = {
     }
     canvas.width = width;
     canvas.height = height;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, width, height);
     const dataURL = canvas.toDataURL(type);
     return utils.base64ToBlob(dataURL);
   },
   downscaleIfNecessary: async (blob) => {
     const type = await utils.getFileTypeFromBlob(blob);
-    if (type === 'image/tiff') {
+    if (type === "image/tiff") {
       const imageData = await utils.getTiffImageData(blob);
       const newBlob = utils.imageDataToBlob(imageData);
       newBlob.name = blob.name;
       newBlob.lastModified = blob.lastModified;
       blob = newBlob;
-    } else if (type === 'image/gif') {
+    } else if (type === "image/gif") {
       const newBlob = await utils.getGIFFirstFrameBlob(blob);
       newBlob.name = blob.name;
       newBlob.lastModified = blob.lastModified;
@@ -131,42 +131,43 @@ const utils = {
   },
   downscaleForAvatar: async (blob, maxWidth = 4096, maxHeight = 4096) => {
     const type = await utils.getFileTypeFromBlob(blob);
-    if (type === 'image/tiff') {
+    if (type === "image/tiff") {
       const imageData = await utils.getTiffImageData(blob);
       const newBlob = utils.imageDataToBlob(imageData);
       newBlob.name = blob.name;
       newBlob.lastModified = blob.lastModified;
       blob = newBlob;
-    } else if (type === 'image/gif') {
+    } else if (type === "image/gif") {
       const newBlob = await utils.getGIFFirstFrameBlob(blob);
       newBlob.name = blob.name;
       newBlob.lastModified = blob.lastModified;
       blob = newBlob;
     }
     const img = await utils.newImage(blob);
-    const base64 = utils.downscaleImage(img, 'image/jpeg', maxWidth, maxHeight);
+    const base64 = utils.downscaleImage(img, "image/jpeg", maxWidth, maxHeight);
     const newBlob = utils.base64ToBlob(base64);
     newBlob.name = utils.extractBlobName(blob, type);
     newBlob.lastModified = blob.lastModified;
+    blob = null;
     return [newBlob, base64];
   },
   extractBlobName: (blob, mimeType) => {
     const { name } = blob;
     const format = utils.getFileExtension(blob);
-    if (!validExtensions.includes('.' + format)) {
-      return name + _get(mimeToExtensions, mimeType, '.jpg');
+    if (!validExtensions.includes("." + format)) {
+      return name + _get(mimeToExtensions, mimeType, ".jpg");
     } else {
       return name;
     }
   },
   downscaleImage: (
     img,
-    type = 'image/jpeg',
+    type = "image/jpeg",
     maxWidth = 4096,
     maxHeight = 4096
   ) => {
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
     const downscaleRatio = Math.max(
       img.width / maxWidth,
       img.height / maxHeight,
@@ -189,14 +190,14 @@ const utils = {
     try {
       const arrayBuffer = await utils.blob2ArrayBuffer(blob.slice(0, 4));
       const view = new DataView(arrayBuffer);
-      let hexString = '';
+      let hexString = "";
       for (let i = 0; i < view.byteLength; i += 1) {
         const b = Number(view.getUint8(i)).toString(16).toUpperCase();
-        hexString += _padStart(b, 2, '0');
+        hexString += _padStart(b, 2, "0");
       }
-      return _get(fileSignatures, hexString, _get(blob, 'type', ''));
+      return _get(fileSignatures, hexString, _get(blob, "type", ""));
     } catch (e) {
-      return _get(blob, 'type', '');
+      return _get(blob, "type", "");
     }
   },
 };
