@@ -95,7 +95,7 @@ export default function HomeComponent() {
         );
         newBlob = blob;
       }
-      let image = await imageUtils.newImage(blob);
+      let image = await imageUtils.newImage(newBlob);
       const { width, height } = image;
       canvas.width = width;
       canvas.height = height;
@@ -107,7 +107,7 @@ export default function HomeComponent() {
         width,
         height,
       });
-      result.blob = blob;
+      result.blob = newBlob;
       result.results = results;
       ctx.clearRect(0, 0, width, height);
 
