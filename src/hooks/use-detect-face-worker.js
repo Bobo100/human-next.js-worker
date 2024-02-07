@@ -6,16 +6,28 @@ const humanConfig = {
   modelBasePath: "https://cdn.jsdelivr.net/npm/@vladmandic/human/models",
   face: {
     enabled: true,
+    detector: {
+      rotation: false,
+      maxDetected: 2,
+      // minConfidence: 0.5,
+      // return: true,
+    },
+    iris: { enabled: false },
+    description: { enabled: false },
     emotion: { enabled: false },
+    antispoof: { enabled: false },
+    liveness: { enabled: false },
     age: { enabled: false },
     gender: { enabled: false },
-    iris: { enabled: false },
   },
   body: { enabled: false },
   hand: { enabled: false },
   object: { enabled: false },
   gesture: { enabled: false },
   segmentation: { enabled: false },
+  async: true,
+  cacheSensitivity: 0,
+  deallocate: true,
 };
 
 const workers = {
@@ -33,11 +45,16 @@ const counter = {
 class useDetectFaceWorker {
   constructor() {
     this.modelsLoaded = false;
+    this.useWorker = true;
+  }
+
+  setUseWorker(useWorker) {
+    this.useWorker = useWorker;
   }
 
   async importHuman() {
     console.log("importHuman");
-    if (!browserUtils.isOffscreenCanvasSupported()) {
+    if (!browserUtils.isOffscreenCanvasSupported() || !this.useWorker) {
       if (!this.human) {
         const Human = await import("@vladmandic/human");
         this.human = new Human.default(humanConfig);
@@ -67,9 +84,10 @@ class useDetectFaceWorker {
 
   async detectFace(type, imageData) {
     if (!this.modelsLoaded) await this.importHuman();
-    if (!browserUtils.isOffscreenCanvasSupported()) {
+    if (!browserUtils.isOffscreenCanvasSupported() || !this.useWorker) {
       let result = {};
       result = await this.human?.detect(imageData, humanConfig);
+      console.log(this.human.env);
       return { result: result[type], type: type };
     } else {
       const id = counter.human++;

@@ -19,6 +19,7 @@ onmessage = async (msg) => {
     console.log("run detect", msg.data.id);
     result = await human.detect(image, msg.data.config);
     console.log("detect done", msg.data.id);
+    console.log(result[msg.data.type]);
     const filterResult = result[msg.data.type].map((item) => {
       return {
         mesh: item.mesh,
@@ -31,7 +32,14 @@ onmessage = async (msg) => {
       result: filterResult,
       type: msg.data.type,
     });
+    human.result = null;
+    msg.data = null;
   } catch (err) {
     console.error(err);
+  } finally {
+    // 清除不再使用的資源
+    // console.log("releaseResources");
+    // await human.tf.dispose();
+    // console.log(human.tf.memory());
   }
 };

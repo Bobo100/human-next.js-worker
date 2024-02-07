@@ -14,19 +14,19 @@ import ProgressBar from "@/components/common/progressbar/progressbar";
 const detector = new useDetectFaceWorker();
 
 export default function HomeComponent() {
+  const [useWorker, setUseWorker] = useState(false);
   const [photos, setPhotos] = useState([]);
   const [fileQueue, setFileQueue] = useState([]);
   const [removedQueue, setRemovedQueue] = useState([]);
   const [modelsLoaded, setModelsLoaded] = useState(false);
   const [runDownscale, setRunDownscale] = useState(false);
 
-  useEffect(() => {
-    async function loadDetector() {
-      await detector.importHuman();
-      setModelsLoaded(detector.modelsLoaded);
-    }
-    loadDetector();
-  }, []);
+  const handleLoadModels = async () => {
+    if (modelsLoaded) return;
+    detector.setUseWorker(useWorker);
+    await detector.importHuman();
+    setModelsLoaded(detector.modelsLoaded);
+  };
 
   useEffect(() => {
     if (!modelsLoaded || !_size(fileQueue)) return;
@@ -150,6 +150,27 @@ export default function HomeComponent() {
   return (
     <>
       <div>
+        <div className={styles.checkboxWrapper}>
+          <label
+            className={styles.checkboxLabel}
+            onClick={() => setUseWorker(!useWorker)}
+          >
+            use Worker or not
+          </label>
+          <input
+            type="checkbox"
+            className={styles.checkbox}
+            checked={useWorker}
+            onChange={() => setUseWorker(!useWorker)}
+          />
+        </div>
+        <button
+          className={styles.loadModelsButton}
+          onClick={handleLoadModels}
+          disabled={modelsLoaded}
+        >
+          {modelsLoaded ? "Models已經Load了" : "Load Models"}
+        </button>
         <div>This is a simple demo of face detection</div>
         <div>Only input images and process using Human Package</div>
         <div className={styles.checkboxWrapper}>
