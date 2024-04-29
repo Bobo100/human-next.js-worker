@@ -7,7 +7,7 @@ const humanConfig = {
   face: {
     enabled: true,
     detector: {
-      rotation: false,
+      rotation: true,
       maxDetected: 2,
       // minConfidence: 0.5,
       // return: true,
@@ -88,7 +88,17 @@ class useDetectFaceWorker {
       let result = {};
       result = await this.human?.detect(imageData, humanConfig);
       console.log(this.human.env);
-      return { result: result[type], type: type };
+      console.log('result', result)
+      // 建立一個canvas 然後用draw.all
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      const drawOptions = {
+        bodyLabels: `person confidence is [score]% and has ${
+          this.human.result?.body?.[0]?.keypoints.length || "no"
+        } keypoints`,
+      };
+      this.human.draw.all(canvas, ctx, result, drawOptions);
+      return { result: result[type], type: type, canvas: canvas };
     } else {
       const id = counter.human++;
       workers.human?.postMessage(

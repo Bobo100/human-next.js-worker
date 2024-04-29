@@ -10,16 +10,18 @@ onmessage = async (msg) => {
       human = new Human.default(msg.data.config);
       await human.load();
     }
+    console.log(human.tf);
     const image = new ImageData(
       new Uint8ClampedArray(msg.data.image),
       msg.data.width,
       msg.data.height
     );
     let result = {};
-    console.log("run detect", msg.data.id);
+    console.log(human.tf.engine().memory().numTensors);
+    // console.log("run detect", msg.data.id);
     result = await human.detect(image, msg.data.config);
     console.log("detect done", msg.data.id);
-    console.log(result[msg.data.type]);
+    // console.log(result[msg.data.type]);
     const filterResult = result[msg.data.type].map((item) => {
       return {
         mesh: item.mesh,
@@ -27,13 +29,12 @@ onmessage = async (msg) => {
         size: item.size,
       };
     });
+    image.data = null;
     postMessage({
       id: msg.data.id,
       result: filterResult,
       type: msg.data.type,
     });
-    human.result = null;
-    msg.data = null;
   } catch (err) {
     console.error(err);
   } finally {

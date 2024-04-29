@@ -107,6 +107,9 @@ export default function HomeComponent() {
         width,
         height,
       });
+      console.log("resultFromWorker", resultFromWorker);
+      console.log("detectFace done", results);
+      const { canvas: faceCanvas } = resultFromWorker;      
       result.blob = newBlob;
       result.results = results;
       ctx.clearRect(0, 0, width, height);
@@ -218,6 +221,12 @@ export default function HomeComponent() {
                       <ProgressBar
                         progress={photo.progress || 0}
                         onComplete={() => onProgressBarComplete(photo.id)}
+                      />
+                    )}
+                    {photo.progressBarComplete && (
+                      <canvas
+                        id={`canvas-${photo.id}`}
+                        className={styles.canvas}
                       />
                     )}
                   </>

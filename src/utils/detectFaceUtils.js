@@ -1,3 +1,5 @@
+import _get from "lodash/get";
+
 const utils = {
   boundingBox: (points) => {
     let minX = Infinity;
@@ -58,6 +60,8 @@ const utils = {
 
     // faceData.annotations.leftEyeUpper0
     // faceData.annotations.leftEyeLower0
+    console.log("faceData.annotations", faceData.annotations);
+
     const leftEyeUpper = faceData.annotations.leftEyeUpper0.map((item) => {
       return { x: item[0], y: item[1] };
     });
@@ -87,7 +91,26 @@ const utils = {
       message.push("avatar.face.detect.error.face.area");
     }
 
-    return { message, boxPoints, eyePoints };
+    const pitch = _get(faceData, "rotation.angle.pitch");
+    const yaw = _get(faceData, "rotation.angle.yaw");
+    const roll = _get(faceData, "rotation.angle.roll");
+
+    if (pitch) {
+      console.log("pitch (tilt)", utils.radianToDegree(pitch));
+    }
+    if (yaw) {
+      console.log("yaw (pan)", utils.radianToDegree(yaw));
+    }
+    if (roll) {
+      console.log("roll (roll)", utils.radianToDegree(roll));
+    }
+
+    return {
+      message,
+      boxPoints,
+      eyePoints,
+      faceAnnotations: faceData.annotations,
+    };
   },
 };
 
