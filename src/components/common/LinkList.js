@@ -11,4 +11,10 @@ export const LinkList = [
     className: "/complexity",
     description: "Complexity",
   },
+  {
+    href: "/draw",
+    name: "Draw RelativeRect",
+    className: "/draw",
+    description: "Draw RelativeRect",
+  },
 ];
