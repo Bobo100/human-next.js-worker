@@ -8,11 +8,20 @@ import _get from "lodash/get";
 import _filter from "lodash/filter";
 
 const relativeRect = {
-  top: 241.2915360501567,
-  left: 323.23510971786834,
-  right: 520.7272727272727,
-  bottom: 482.23197492163007,
+  top: 240,
+  bottom: 480,
+  left: 322,
+  right: 519,
 };
+
+const rejectRect = [
+  // {
+  //   top: 142.51188051595383,
+  //   bottom: 440.74405974202307,
+  //   left: 231.49490835030548,
+  //   right: 507.4813306177868,
+  // },
+];
 
 export default function DrawComponent() {
   const canvasRef = useRef(null);
@@ -42,6 +51,16 @@ export default function DrawComponent() {
       const rectWidth = right - left;
       const rectHeight = bottom - top;
       ctx.strokeRect(left, top, rectWidth, rectHeight);
+
+      // rejectRect
+      _filter(rejectRect, (rect) => {
+        const { top, bottom, left, right } = rect;
+        const rectWidth = right - left;
+        const rectHeight = bottom - top;
+        // 改用藍色
+        ctx.strokeStyle = "blue";
+        ctx.strokeRect(left, top, rectWidth, rectHeight);
+      });
     };
   }, [imageSrc, relativeRect]);
 

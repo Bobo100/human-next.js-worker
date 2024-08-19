@@ -17,4 +17,10 @@ export const LinkList = [
     className: "/draw",
     description: "Draw RelativeRect",
   },
+  {
+    href: "/crop",
+    name: "Crop Recover",
+    className: "/crop",
+    description: "Crop Recover",
+  },
 ];
