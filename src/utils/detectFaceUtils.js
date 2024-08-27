@@ -19,7 +19,16 @@ const utils = {
   radianToDegree: (radian) => {
     return (radian * 180) / Math.PI;
   },
+  calculateBoxPoints: (faceMesh) => {
+    const { minX, minY, maxX, maxY } = utils.boundingBox(faceMesh);
 
+    return {
+      topLeft: { x: minX, y: minY },
+      topRight: { x: maxX, y: minY },
+      bottomLeft: { x: minX, y: maxY },
+      bottomRight: { x: maxX, y: maxY },
+    };
+  },
   detectFace: async (detections, image) => {
     let message = [];
     const { result } = detections;
@@ -110,6 +119,60 @@ const utils = {
       boxPoints,
       eyePoints,
       faceAnnotations: faceData.annotations,
+    };
+  },
+  getFaceInfosAndBlobForHairStyle: (image, faceRect, scale) => {
+    const { width: imgWidth, height: imgHeight } = image;
+    const { top, bottom, left, right } = faceRect;
+    const rectWidth = right - left;
+    const rectHeight = bottom - top;
+    const cx = (right + left) / 2;
+    const cy = (bottom + top) / 2;
+    const longerSide = Math.max(rectWidth, rectHeight);
+    const cropLeft = Math.max(parseInt(cx - 1.75 * longerSide), 0);
+    const cropRight = Math.min(parseInt(cx + 1.75 * longerSide), imgWidth);
+    const cropTop = Math.max(parseInt(cy - 1.5 * longerSide), 0);
+    const cropBottom = Math.min(parseInt(cy + 2.75 * longerSide), imgHeight);
+    const cropWidth = cropRight - cropLeft;
+    const cropHeight = cropBottom - cropTop;
+    const blob = utils.drawScaleCropImage(
+      image,
+      {
+        cropLeft,
+        cropRight,
+        cropTop,
+        cropBottom,
+      },
+      scale
+    );
+    const faceRectInCroppedImage = {
+      top: Math.max((top - cropTop) * scale, 0),
+      bottom: Math.min((bottom - cropTop) * scale, cropHeight * scale),
+      left: Math.max((left - cropLeft) * scale, 0),
+      right: Math.min((right - cropLeft) * scale, cropWidth * scale),
+    };
+
+    return {
+      scale,
+      cropRect: {
+        cropLeft: cropLeft * scale,
+        cropRight: cropRight * scale,
+        cropTop: cropTop * scale,
+        cropBottom: cropBottom * scale,
+      },
+      cropBlob: blob,
+      cropUrl: URL.createObjectURL(blob),
+      originalImage: {
+        width: imgWidth,
+        height: imgHeight,
+      },
+      relativeRect: faceRectInCroppedImage,
+      faceRect: {
+        top: top * scale,
+        bottom: bottom * scale,
+        left: left * scale,
+        right: right * scale,
+      },
     };
   },
 };

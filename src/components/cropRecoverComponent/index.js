@@ -8,10 +8,10 @@ import _get from "lodash/get";
 import _filter from "lodash/filter";
 
 const cropRect = {
-  cropLeft: 0,
-  cropRight: 893.1500484027106,
+  cropLeft: 796.5529075309819,
+  cropRight: 1552.1067683508102,
   cropTop: 0,
-  cropBottom: 979.3920619554696,
+  cropBottom: 1024,
 };
 
 const rejectRect = [

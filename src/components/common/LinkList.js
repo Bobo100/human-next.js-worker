@@ -23,4 +23,10 @@ export const LinkList = [
     className: "/crop",
     description: "Crop Recover",
   },
+  {
+    href: "/human",
+    name: "Human Pose",
+    className: "/human",
+    description: "Human Pose",
+  },
 ];

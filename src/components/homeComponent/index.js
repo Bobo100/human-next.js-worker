@@ -1,7 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import useDetectFaceWorker from "@/hooks/use-detect-face-worker";
 import imageUtils from "@/utils/imageUtils";
-import detectFaceUtils from "@/utils/detectFaceUtils";
 import _size from "lodash/size";
 import _slice from "lodash/slice";
 import _range from "lodash/range";

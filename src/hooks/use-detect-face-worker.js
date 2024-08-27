@@ -1,9 +1,11 @@
 import browserUtils from "@/utils/browserUtils";
 
+const HUMAN_VERSION = "2.3.2";
+
 const humanConfig = {
   debug: true,
   backend: "wasm",
-  modelBasePath: "https://cdn.jsdelivr.net/npm/@vladmandic/human/models",
+  modelBasePath: `https://cdn.jsdelivr.net/npm/@vladmandic/human@${HUMAN_VERSION}/models/`,
   face: {
     enabled: true,
     detector: {
@@ -84,11 +86,12 @@ class useDetectFaceWorker {
 
   async detectFace(type, imageData) {
     if (!this.modelsLoaded) await this.importHuman();
+    console.log("run detect")
     if (!browserUtils.isOffscreenCanvasSupported() || !this.useWorker) {
       let result = {};
       result = await this.human?.detect(imageData, humanConfig);
       console.log(this.human.env);
-      console.log('result', result)
+      console.log("result", result);
       // 建立一個canvas 然後用draw.all
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
@@ -98,7 +101,18 @@ class useDetectFaceWorker {
         } keypoints`,
       };
       this.human.draw.all(canvas, ctx, result, drawOptions);
-      return { result: result[type], type: type, canvas: canvas };
+      // 轉出一個blob
+      const blob = await new Promise((resolve) => {
+        canvas.toBlob((blob) => resolve(blob), "image/jpeg");
+      });
+      const url = URL.createObjectURL(blob);
+      return {
+        result: result[type],
+        type: type,
+        canvas: canvas,
+        blob: blob,
+        url: url,
+      };
     } else {
       const id = counter.human++;
       workers.human?.postMessage(
