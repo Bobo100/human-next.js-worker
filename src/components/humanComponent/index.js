@@ -8,26 +8,27 @@ import _get from "lodash/get";
 import _filter from "lodash/filter";
 import detectFaceUtils from "@/utils/detectFaceUtils";
 
-const HUMAN_VERSION = "2.3.2";
+const HUMAN_VERSION = "3.2.2";
 
 const humanConfig = {
   debug: true,
   backend: "wasm",
-  // modelBasePath: `https://cdn.jsdelivr.net/npm/@vladmandic/human@${HUMAN_VERSION}/models/`,
-  modelBasePath: "/assets/models/",
+  modelBasePath: `https://cdn.jsdelivr.net/npm/@vladmandic/human@${HUMAN_VERSION}/models/`,
+  // modelBasePath: "/assets/models/",
   filter: { enabled: false },
   face: {
     enabled: true,
     detector: {
       rotation: false,
       maxDetected: 20,
-      minConfidence: 0.5,
+      minConfidence: 0.2,
       /** should face detection return processed and cropped face tensor that can with an external model for addtional processing?
        * if enabled it must be manually deallocated to avoid memory leak */
       return: false,
+      // scale: 1,
     },
     iris: { enabled: false },
-    description: { enabled: false },
+    description: { enabled: true },
     emotion: { enabled: false },
     antispoof: { enabled: false },
     liveness: { enabled: false },
@@ -38,15 +39,17 @@ const humanConfig = {
   gesture: { enabled: false },
   segmentation: { enabled: false },
   async: true,
-  cacheModels: true,
+  cacheModels: false, // set to false for use the new model version
+  softwareKernels: true,
   warmup: "face",
   cacheSensitivity: 0,
-  // deallocate: true,
+  // deallocate: false,
 };
 
 export default function HumanComponent() {
   const [human, setHuman] = useState(null);
   const [modelsLoaded, setModelsLoaded] = useState(false);
+  const [result, setResult] = useState(null);
 
   useEffect(() => {
     importHuman();
@@ -93,7 +96,11 @@ export default function HumanComponent() {
 
       // 使用 Human 库进行脸部检测
       const result = await human.detect(data);
+      detectFaceUtils.addFaceSize(result);
+      detectFaceUtils.filterEmptyFaces(result);
+      detectFaceUtils.adjustDetectionSize(result, image.width, image.height);
       console.log("result", result);
+      setResult(result);
       const drawOptions = {
         bodyLabels: `person confidence is [score]% and has ${
           human.result?.body?.[0]?.keypoints.length || "no"
@@ -112,11 +119,18 @@ export default function HumanComponent() {
         const faceMesh = face.mesh.map(([x, y]) => [x, y]);
         const faceRect = detectFaceUtils.calculateBoxPoints(faceMesh);
         const { topLeft, topRight, bottomLeft, bottomRight } = faceRect;
-        console.log("faceRect", faceRect);
+        const faceRectWidth = Math.abs(topRight.x - topLeft.x);
+        const faceRectHeight = Math.abs(bottomLeft.y - topLeft.y);
+        console.log(
+          "faceRectWidth",
+          faceRectWidth,
+          "faceRectHeight",
+          faceRectHeight
+        );
 
         // 设置绘制样式
         ctx.strokeStyle = "green"; // 设置边框颜色
-        ctx.lineWidth = 2; // 设置线条宽度
+        ctx.lineWidth = 3; // 设置线条宽度
 
         // 绘制矩形框
         ctx.beginPath();
@@ -126,8 +140,37 @@ export default function HumanComponent() {
         ctx.lineTo(bottomLeft.x, bottomLeft.y);
         ctx.closePath(); // 可选：闭合路径
         ctx.stroke(); // 描边绘制线条
+
+        console.log("face", face);
+        // face.box 是一個array作者說是[x, y, width, height]
+        // 我們也用黃色框框框起來
+        ctx.strokeStyle = "yellow";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(face.box[0], face.box[1], face.box[2], face.box[3]);
       });
     };
+    // 然後要把檔案清空
+    e.target.value = "";
+  };
+
+  const handleDownloadCanvas = () => {
+    const canvas = document.getElementById("faceCanvas");
+    const url = canvas.toDataURL("image/png");
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "face.png";
+    a.click();
+  };
+
+  const handleResultToTxt = () => {
+    const text = JSON.stringify(result, null, 2);
+    const blob = new Blob([text], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "result.json";
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -139,6 +182,20 @@ export default function HumanComponent() {
           accept="image/*"
           onChange={handleImageChange}
         />
+        <button
+          onClick={handleDownloadCanvas}
+          disabled={!_size(result)}
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2"
+        >
+          Download Canvas
+        </button>
+        <button
+          onClick={handleResultToTxt}
+          disabled={!_size(result)}
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        >
+          Download Result
+        </button>
         <canvas id="faceCanvas"></canvas>
       </div>
     </>

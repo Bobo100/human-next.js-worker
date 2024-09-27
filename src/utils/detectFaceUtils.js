@@ -1,4 +1,7 @@
 import _get from "lodash/get";
+import _forEach from "lodash/forEach";
+import _filter from "lodash/filter";
+import _map from "lodash/map";
 
 const utils = {
   boundingBox: (points) => {
@@ -174,6 +177,57 @@ const utils = {
         right: right * scale,
       },
     };
+  },
+  addFaceSize: (detections) => {
+    _forEach(_get(detections, "face"), (f) => {
+      if (!f.size) {
+        f.size = [_get(f, "box.2", 0), _get(f, "box.3", 0)];
+      }
+    });
+    detections.width = detections?.canvas?.width || 0;
+    detections.height = detections?.canvas?.height || 0;
+  },
+  filterEmptyFaces: (detections) => {
+    detections.face = _filter(detections.face, (f) => {
+      const [width, height] = f.size;
+      return width !== 0 && height !== 0;
+    });
+  },
+  adjustDetectionSize: (detections, width, height) => {
+    /** maximum size of Human@2.3.2 is 2048 pixels, if width/height is larger than
+     * 2048 pixels, need to recalculate detection size */
+    /*
+    Human@3.2.2 is 3048 pixels
+    */
+    const canvasWidth = detections?.canvas?.width || 0;
+    const canvasHeight = detections?.canvas?.height || 0;
+    if (canvasWidth === 0 || canvasHeight === 0) return;
+    if (width <= canvasWidth && height <= canvasHeight) return;
+    const scale = width / canvasWidth;
+    // rescale detections width/height
+    detections.width *= scale;
+    detections.height *= scale;
+    // rescale detections face(s)
+    _forEach(detections.face, (f) => {
+      // type 1: [point1, point2, point3]
+      _forEach(["box", "size"], (key) => {
+        f[key] = _map(f[key], (point) => point * scale);
+      });
+      // type 2: Array[[point1, point2, point3]]
+      _forEach(["mesh"], (key) => {
+        f[key] = _map(f[key], (points) => {
+          return _map(points, (point) => point * scale);
+        });
+      });
+      // type 3: Object{Array[[point1, point2, point3]]}
+      _forEach(["annotations"], (key) => {
+        _forEach(f[key], (_, subKey) => {
+          f[key][subKey] = _map(f[key][subKey], (points) => {
+            return _map(points, (point) => point * scale);
+          });
+        });
+      });
+    });
   },
 };
 
